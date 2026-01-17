@@ -129,10 +129,10 @@
             </select>
         </div>
 
-        <label>Anexar Foto (Câmera ou Galeria) *</label>
+        <label>Foto *</label>
         <div class="file-box" onclick="document.getElementById('foto').click()">
-            <span id="txtFoto">📸 Clique para abrir Câmera ou Galeria</span>
-            <input type="file" id="foto" accept="image/*" style="display:none" onchange="previewImg()">
+            <span id="txtFoto">📸 Clique para Câmera ou Galeria</span>
+            <input type="file" id="foto" style="display:none" onchange="previewImg()">
             <img id="preview">
         </div>
 
@@ -146,7 +146,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "SUA_URL_AQUI/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzwLBI0EKjtXfRc81h1omtcQfQ5k_k08Pqxs3cMsbB1R3acZ2KEJvd4pfKknWNWVRvk1Q/exec";
 
     function nextSec(n) {
         if (n === 2 && !document.getElementById('profissional').value) { alert("Selecione seu nome."); return; }
