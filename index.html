@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Coleta de Imagens Odontológicas - PET Saúde</title>
+    <title>Sistema de Coleta - PET Saúde</title>
     <style>
-        :root { --primary: #0056b3; --success: #28a745; --bg: #f8f9fa; }
+        :root { --primary: #0056b3; --success: #28a745; --bg: #f8f9fa; --border: #dee2e6; }
         body { font-family: 'Segoe UI', sans-serif; padding: 15px; background: var(--bg); color: #333; }
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
         .header-title { text-align: center; margin-bottom: 20px; }
@@ -16,6 +16,19 @@
         h2 { color: var(--primary); font-size: 1.1rem; border-bottom: 2px solid #eee; padding-bottom: 8px; margin-top: 0; }
         label { display: block; margin: 12px 0 5px; font-weight: bold; font-size: 0.85rem; }
         input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        
+        .guia-icdas { background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin: 15px 0; }
+        .guia-header { background: #e9ecef; padding: 8px; font-weight: bold; font-size: 0.8rem; text-align: center; border-bottom: 1px solid var(--border); }
+        .icdas-row { padding: 8px 12px; border-bottom: 1px solid #f1f1f1; font-size: 0.75rem; line-height: 1.4; }
+        .icdas-row:last-child { border-bottom: none; }
+        .icdas-row b { display: block; color: var(--primary); margin-bottom: 2px; }
+        
+        .cat-saudavel { border-left: 4px solid #6c757d; }
+        .cat-inicial { border-left: 4px solid #ffc107; background: #fffcf2; }
+        .cat-moderada { border-left: 4px solid #fd7e14; background: #fff9f4; }
+        .cat-severa { border-left: 4px solid #dc3545; background: #fff5f6; }
+        .cat-rest { border-left: 4px solid #007bff; background: #f0f7ff; }
+
         .btn-group { display: flex; gap: 10px; margin-top: 20px; }
         button { flex: 1; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
         .btn-next { background: var(--primary); color: white; }
@@ -26,7 +39,6 @@
         #preview { width: 100%; border-radius: 8px; display: none; margin-top: 10px; }
         .step-indicator { text-align: center; font-size: 0.65rem; color: #999; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
         .info-lesao { background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; font-size: 0.8rem; margin-bottom: 10px; display: none; }
-        .desc-ajuda { font-size: 0.75rem; color: #666; font-weight: normal; margin-bottom: 5px; background: #f1f1f1; padding: 8px; border-radius: 5px; line-height: 1.3; }
     </style>
 </head>
 <body>
@@ -34,23 +46,29 @@
 <div class="card">
     <div class="header-title">
         <h1>Coleta de Imagens Odontológicas para Análise de Problemas Bucais</h1>
-        <p>Iniciativa do PET Saúde Digital GAT 10.</p>
+        <p>PET Saúde Digital GAT 10</p>
     </div>
 
     <div class="step-indicator" id="stepTag">Passo 1 de 4</div>
 
     <div id="sec1" class="section active">
         <h2>Identificação do Avaliador</h2>
-        <label>Nome do Profissional Avaliador *</label>
-        <select id="profissional">
-            <option value="" disabled selected>Clique para selecionar seu nome</option>
+        <label>Selecione seu Nome *</label>
+        <select id="selectProfissional" onchange="verificarOutro(this.value)">
+            <option value="" disabled selected>Clique para selecionar...</option>
             <option value="Kaio Iury Luz Fernandes">Kaio Iury Luz Fernandes</option>
             <option value="Lívia Maria Martins Aragão">Lívia Maria Martins Aragão</option>
             <option value="Nycollas Fernandes de Carvalho">Nycollas Fernandes de Carvalho</option>
             <option value="Welison Nascimento Moreira">Welison Nascimento Moreira</option>
+            <option value="outro">Outro (Digitar nome)</option>
         </select>
+        <div id="boxOutro" style="display: none; margin-top: 10px;">
+            <label>Digite seu nome completo *</label>
+            <input type="text" id="profissionalOutro" placeholder="Escreva seu nome aqui">
+        </div>
+        <input type="hidden" id="profissional">
         <div class="btn-group">
-            <button class="btn-next" onclick="nextSec(2)">Próximo: Dados do Paciente</button>
+            <button class="btn-next" onclick="validarEPassar()">Próximo: Dados do Paciente</button>
         </div>
     </div>
 
@@ -69,12 +87,10 @@
         </select>
         <label>Idade *</label>
         <input type="number" id="idade">
-        <label>Unidade de Atendimento *</label>
+        <label>Unidade *</label>
         <select id="unidade">
-            <option value="" disabled selected>Selecionar Unidade...</option>
-            <option value="UBS Centro">UBS Centro</option>
-            <option value="UBS Vila Nova">UBS Vila Nova</option>
-            <option value="UBS Interior">UBS Interior</option>
+            <option value="" disabled selected>Selecionar...</option>
+            <option value="Calibração">Calibração</option>
         </select>
         <div class="btn-group">
             <button class="btn-prev" onclick="nextSec(1)">Voltar</button>
@@ -92,44 +108,65 @@
         </select>
         <div class="btn-group">
             <button class="btn-prev" onclick="nextSec(2)">Voltar</button>
-            <button class="btn-next" onclick="nextSec(4)">Próximo: Capturar Foto</button>
+            <button class="btn-next" onclick="nextSec(4)">Próximo: Capturar</button>
         </div>
     </div>
 
     <div id="sec4" class="section">
         <h2 id="tituloFinal">Detalhes e Captura</h2>
         <div id="msgLesao" class="info-lesao">Você selecionou <b>Lesão Bucal</b>.</div>
+        
         <div id="camposCarie">
-            <label>Número do Dente (1-32) *</label>
-            <input type="number" id="numDente" placeholder="Ex: 18">
+            <label>Tipo de Dentição *</label>
+            <select id="tipoDenticao" onchange="atualizarListaDentes()">
+                <option value="adulto" selected>Adulto (Permanente)</option>
+                <option value="crianca">Criança (Decíduo)</option>
+            </select>
+
+            <label>Número do Dente *</label>
+            <select id="numDente"></select>
+
             <label>Superfície</label>
             <select id="superficie">
-                <option value="Mesial">Mesial</option>
-                <option value="Oclusal">Oclusal/Incisal</option>
-                <option value="Distal">Distal</option>
-                <option value="Vestibular">Vestibular</option>
-                <option value="Palatina">Palatina/Lingual</option>
+                <option value="M">Mesial</option>
+                <option value="O/I">Oclusal/Incisal</option>
+                <option value="D">Distal</option>
+                <option value="V">Vestibular</option>
+                <option value="P/L">Palatina/Lingual</option>
             </select>
+
+            <div class="guia-icdas">
+                <div class="guia-header">GUIA ICDAS - LESÃO DE CÁRIE</div>
+                <div class="icdas-row cat-saudavel"><b>0: Saudável</b>0: Dente hígido.</div>
+                <div class="icdas-row cat-inicial"><b>1 e 2: Lesão Inicial</b>1: Opacidade branca visível após secagem, restrita ao fundo do sulco<br>2: Opacidade branca visível sem secagem, invadindo as vertentes</div>
+                <div class="icdas-row cat-moderada"><b>3 e 4: Lesão Moderada</b>3: Microcavidade restrita ao esmalte<br>4: Sombra cinzenta ou marrom no esmalte</div>
+                <div class="icdas-row cat-severa"><b>5 e 6: Lesão Severa</b>5: Cavidade distinta com dentina exposta até metade da superfície<br>6: Cavidade extensa com dentina visível mais de 50%</div>
+            </div>  
+
             <label>ICDAS – Lesão</label>
-            <div class="desc-ajuda">0:Saudável | 1-2:Inicial | 3-4:Moderada | 5-6:Severa</div>
             <select id="icdasLesao">
                 <option value="0">0 = Saudável</option>
                 <option value="1-2">1-2 = Lesão Inicial</option>
                 <option value="3-4">3-4 = Lesão Moderada</option>
                 <option value="5-6">5-6 = Lesão Severa</option>
             </select>
-            <label>ICDAS – Restauração</label>
+
+            <label>ICDAS – Restauração e Selante</label>
             <select id="icdasRest">
                 <option value="0">0 = Nada</option>
                 <option value="1">1 = Selante parcial</option>
                 <option value="2">2 = Selante completo</option>
-                <option value="3">3 = Restauração cor dente</option>
-                <option value="4">4 = Amálgama</option>
-                <option value="5-9">5-9 = Outros</option>
+                <option value="3">3 = Restauração da cor do dente</option>
+                <option value="4">4 = Restauração de amálgama</option>
+                <option value="5">5 = Coroa aço/policarboxilato</option>
+                <option value="6">6 = Coroa/Faceta nobre</option>
+                <option value="7">7 = Restauração perdida/fraturada</option>
+                <option value="8">8 = Temporária</option>
+                <option value="9">9 = Outra</option>
             </select>
         </div>
 
-        <label>Foto *</label>
+        <label>Anexar Foto *</label>
         <div class="file-box" onclick="document.getElementById('foto').click()">
             <span id="txtFoto">📸 Clique para Câmera ou Galeria</span>
             <input type="file" id="foto" style="display:none" onchange="previewImg()">
@@ -148,8 +185,39 @@
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzwLBI0EKjtXfRc81h1omtcQfQ5k_k08Pqxs3cMsbB1R3acZ2KEJvd4pfKknWNWVRvk1Q/exec";
 
+    function verificarOutro(valor) {
+        document.getElementById('boxOutro').style.display = (valor === "outro") ? "block" : "none";
+    }
+
+    function validarEPassar() {
+        const select = document.getElementById('selectProfissional');
+        const inputOutro = document.getElementById('profissionalOutro');
+        const hiddenInput = document.getElementById('profissional');
+        let nomeFinal = (select.value === "outro") ? inputOutro.value.trim() : select.value;
+        if (!nomeFinal) { alert("Por favor, selecione ou digite seu nome."); return; }
+        hiddenInput.value = nomeFinal;
+        nextSec(2);
+    }
+
+    const dentesAdulto = [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28, 48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38];
+    const dentesCrianca = [55, 54, 53, 52, 51, 61, 62, 63, 64, 65, 85, 84, 83, 82, 81, 71, 72, 73, 74, 75];
+
+    function atualizarListaDentes() {
+        const tipo = document.getElementById('tipoDenticao').value;
+        const selectDente = document.getElementById('numDente');
+        const lista = tipo === 'adulto' ? dentesAdulto : dentesCrianca;
+        selectDente.innerHTML = "";
+        lista.forEach(num => {
+            const option = document.createElement('option');
+            option.value = num;
+            option.textContent = num;
+            selectDente.appendChild(option);
+        });
+    }
+
+    atualizarListaDentes();
+
     function nextSec(n) {
-        if (n === 2 && !document.getElementById('profissional').value) { alert("Selecione seu nome."); return; }
         if (n === 4) {
             const tipo = document.getElementById('tipoProblema').value;
             document.getElementById('camposCarie').style.display = tipo === "lesao" ? 'none' : 'block';
@@ -175,60 +243,53 @@
         }
     }
 
-    function getIniciais(nome) { return nome.split(' ').map(n => n[0]).join('').toUpperCase(); }
+    function getIniciais(nome) { return nome.trim().split(' ').map(n => n[0]).join('').toUpperCase(); }
 
     async function enviar(manter) {
         const foto = document.getElementById('foto').files[0];
         const tipo = document.getElementById('tipoProblema').value;
-        const numDente = document.getElementById('numDente').value;
+        const dente = document.getElementById('numDente').value;
 
-        if (!foto || (tipo === 'carie' && !numDente)) { alert("Foto e dente são obrigatórios!"); return; }
+        if (!foto || (tipo === 'carie' && !dente)) { alert("Foto e dente são obrigatórios!"); return; }
 
         const btnA = document.getElementById('btnAdd'); const btnF = document.getElementById('btnFim');
         btnA.disabled = true; btnF.disabled = true;
-        document.getElementById('status').innerText = "⏳ Enviando...";
+        document.getElementById('status').innerText = "⏳ Enviando dados...";
 
         const reader = new FileReader();
         reader.readAsDataURL(foto);
         reader.onload = async function() {
-            const avaliador = document.getElementById('profissional').value;
-            const iniciais = getIniciais(avaliador);
+            const prof = document.getElementById('profissional').value;
             const ts = new Date().getTime();
-            const nomeP = document.getElementById('paciente').value.trim() || "NaN";
-            const docP = document.getElementById('documento').value.trim() || "NaN";
-
-            let nomeArq = tipo === 'carie' ? `C_ICDAS${document.getElementById('icdasLesao').value}_${iniciais}_${ts}.jpg` : `L_${iniciais}_${ts}.jpg`;
-
             const payload = {
-                profissional: avaliador, paciente: nomeP, documento: docP,
+                profissional: prof,
+                paciente: document.getElementById('paciente').value.trim() || "NaN",
+                documento: document.getElementById('documento').value.trim() || "NaN",
                 genero: document.getElementById('genero').value || "NaN",
                 idade: document.getElementById('idade').value || "NaN",
                 unidade: document.getElementById('unidade').value || "NaN",
+                // Se for lesão, enviamos "N/A", se for cárie, pegamos o valor do campo
+                denticao: tipo === 'lesao' ? "N/A" : document.getElementById('tipoDenticao').value,
                 tipo: tipo,
-                dente: tipo === 'lesao' ? "N/A" : numDente,
+                dente: tipo === 'lesao' ? "N/A" : dente,
                 superficie: tipo === 'lesao' ? "N/A" : document.getElementById('superficie').value,
                 icdasLesao: tipo === 'lesao' ? "N/A" : document.getElementById('icdasLesao').value,
                 icdasRest: tipo === 'lesao' ? "N/A" : document.getElementById('icdasRest').value,
                 foto: reader.result.split(',')[1],
-                nomeArquivo: nomeArq
+                nomeArquivo: tipo === 'carie' ? `C_ICDAS${document.getElementById('icdasLesao').value}_${getIniciais(prof)}_${ts}.jpg` : `L_${getIniciais(prof)}_${ts}.jpg`
             };
 
             try {
                 await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
                 if (manter) {
-                    alert("✅ Foto enviada!");
-                    document.getElementById('numDente').value = "";
+                    alert("✅ Registrado!");
                     document.getElementById('foto').value = "";
                     document.getElementById('preview').style.display = 'none';
                     document.getElementById('txtFoto').style.display = 'flex';
                     btnA.disabled = false; btnF.disabled = false;
-                } else {
-                    alert("✅ Paciente finalizado!");
-                    location.reload();
-                }
-            } catch (e) {
-                alert("Erro no envio."); btnA.disabled = false; btnF.disabled = false;
-            }
+                    document.getElementById('status').innerText = "";
+                } else { alert("✅ Paciente finalizado!"); location.reload(); }
+            } catch (e) { alert("Erro de conexão."); btnA.disabled = false; btnF.disabled = false; }
         };
     }
 </script>
