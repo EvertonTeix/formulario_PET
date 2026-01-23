@@ -27,7 +27,6 @@
         .cat-inicial { border-left: 4px solid #ffc107; background: #fffcf2; }
         .cat-moderada { border-left: 4px solid #fd7e14; background: #fff9f4; }
         .cat-severa { border-left: 4px solid #dc3545; background: #fff5f6; }
-        .cat-rest { border-left: 4px solid #007bff; background: #f0f7ff; }
 
         .btn-group { display: flex; gap: 10px; margin-top: 20px; }
         button { flex: 1; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
@@ -35,13 +34,31 @@
         .btn-prev { background: #e0e0e0; color: #333; }
         .btn-save { background: var(--success); color: white; }
         .btn-add { background: #6f42c1; color: white; }
+        
         .file-box { border: 2px dashed var(--primary); padding: 15px; text-align: center; border-radius: 8px; background: #f0f7ff; cursor: pointer; margin-top: 10px; min-height: 100px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         #preview { width: 100%; border-radius: 8px; display: none; margin-top: 10px; }
         .step-indicator { text-align: center; font-size: 0.65rem; color: #999; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
         .info-lesao { background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; font-size: 0.8rem; margin-bottom: 10px; display: none; }
+
+        /* ESTILO DO MODAL VISUAL */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 15px; text-align: center; max-width: 80%; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: scaleUp 0.3s ease; }
+        .modal-content h3 { color: var(--success); margin-top: 0; }
+        .modal-content p { font-size: 1rem; color: #444; }
+        .modal-btn { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        @keyframes scaleUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body>
+
+<div id="modalSucesso" class="modal-overlay">
+    <div class="modal-content">
+        <div id="modalEmoji" style="font-size: 50px;">✅</div>
+        <h3 id="modalTitulo">Sucesso!</h3>
+        <p id="modalMensagem">Dados enviados corretamente.</p>
+        <button class="modal-btn" onclick="fecharModal()">OK</button>
+    </div>
+</div>
 
 <div class="card">
     <div class="header-title">
@@ -54,7 +71,7 @@
     <div id="sec1" class="section active">
         <h2>Identificação do Avaliador</h2>
         <label>Selecione seu Nome *</label>
-        <select id="selectProfissional" onchange="verificarOutro(this.value)">
+        <select id="selectProfissional" onchange="verificarOutro(this.value, 'boxOutro')">
             <option value="" disabled selected>Clique para selecionar...</option>
             <option value="Kaio Iury Luz Fernandes">Kaio Iury Luz Fernandes</option>
             <option value="Lívia Maria Martins Aragão">Lívia Maria Martins Aragão</option>
@@ -89,15 +106,22 @@
         <label>Idade *</label>
         <input type="number" id="idade">
         <label>Unidade *</label>
-        <select id="unidade">
+        <select id="unidadeSelect" onchange="verificarOutro(this.value, 'boxUnidadeOutro')">
             <option value="" disabled selected>Selecionar...</option>
             <option value="Calibração">Calibração</option>
             <option value="Posto de Saúde Maria José Turbay Barreira">Posto de Saúde Maria José Turbay Barreira</option>
             <option value="Posto de Saúde Roberto da Silva Bruno">Posto de Saúde Roberto da Silva Bruno</option>
+            <option value="outro">Outro (Digitar local)</option>
         </select>
+        <div id="boxUnidadeOutro" style="display: none; margin-top: 10px;">
+            <label>Digite o nome da Unidade *</label>
+            <input type="text" id="unidadeOutro" placeholder="Escreva o local aqui">
+        </div>
+        <input type="hidden" id="unidade">
+
         <div class="btn-group">
             <button class="btn-prev" onclick="nextSec(1)">Voltar</button>
-            <button class="btn-next" onclick="nextSec(3)">Próximo: Problema</button>
+            <button class="btn-next" onclick="validarPasso2()">Próximo: Problema</button>
         </div>
     </div>
 
@@ -111,7 +135,7 @@
         </select>
         <div class="btn-group">
             <button class="btn-prev" onclick="nextSec(2)">Voltar</button>
-            <button class="btn-next" onclick="nextSec(4)">Próximo: Capturar</button>
+            <button class="btn-next" onclick="validarPasso3()">Próximo: Capturar</button>
         </div>
     </div>
 
@@ -125,12 +149,11 @@
                 <option value="adulto" selected>Adulto (Permanente)</option>
                 <option value="crianca">Criança (Decíduo)</option>
             </select>
-
             <label>Número do Dente *</label>
             <select id="numDente"></select>
-
-            <label>Superfície</label>
+            <label>Superfície *</label>
             <select id="superficie">
+                <option value="" disabled selected>Selecionar...</option>
                 <option value="M">Mesial</option>
                 <option value="O/I">Oclusal/Incisal</option>
                 <option value="D">Distal</option>
@@ -146,21 +169,23 @@
                 <div class="icdas-row cat-severa"><b>5 e 6: Lesão Severa</b>5: Cavidade distinta com dentina exposta até metade da superfície<br>6: Cavidade extensa com dentina visível mais de 50%</div>
             </div>  
 
-            <label>ICDAS – Lesão</label>
+            <label>ICDAS – Lesão *</label>
             <select id="icdasLesao">
+                <option value="" disabled selected>Selecionar...</option>
                 <option value="0">0 = Saudável</option>
                 <option value="1-2">1-2 = Lesão Inicial</option>
                 <option value="3-4">3-4 = Lesão Moderada</option>
                 <option value="5-6">5-6 = Lesão Severa</option>
             </select>
 
-            <label>ICDAS – Restauração e Selante</label>
+            <label>ICDAS – Restauração e Selante *</label>
             <select id="icdasRest">
+                <option value="" disabled selected>Selecionar...</option>
                 <option value="0">0 = Nada</option>
                 <option value="1">1 = Selante parcial</option>
                 <option value="2">2 = Selante completo</option>
-                <option value="3">3 = Restauração da cor do dente</option>
-                <option value="4">4 = Restauração de amálgama</option>
+                <option value="3">3 = Restauração cor dente</option>
+                <option value="4">4 = Amálgama</option>
                 <option value="5">5 = Coroa aço/policarboxilato</option>
                 <option value="6">6 = Coroa/Faceta nobre</option>
                 <option value="7">7 = Restauração perdida/fraturada</option>
@@ -178,18 +203,33 @@
 
         <div class="btn-group">
             <button class="btn-prev" onclick="nextSec(3)">Voltar</button>
-            <button class="btn-add" id="btnAdd" onclick="enviar(true)">+ Outra Imagem</button>
+            <button class="btn-add" id="btnAdd" onclick="enviar(true)">Adicionar outra imagem</button>
         </div>
         <button class="btn-save" id="btnFim" onclick="enviar(false)" style="margin-top:10px; width: 100%;">FINALIZAR PACIENTE</button>
-        <p id="status" style="text-align: center; font-size: 0.8rem; margin-top: 10px;"></p>
+        <p id="status" style="text-align: center; font-size: 0.9rem; font-weight: bold; color: var(--primary); margin-top: 10px;"></p>
     </div>
 </div>
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzwLBI0EKjtXfRc81h1omtcQfQ5k_k08Pqxs3cMsbB1R3acZ2KEJvd4pfKknWNWVRvk1Q/exec";
+    let redirecionarAposModal = false;
 
-    function verificarOutro(valor) {
-        document.getElementById('boxOutro').style.display = (valor === "outro") ? "block" : "none";
+    function mostrarModal(titulo, mensagem, emoji = "✅", cor = "var(--success)", recarregar = false) {
+        document.getElementById('modalEmoji').innerText = emoji;
+        document.getElementById('modalTitulo').innerText = titulo;
+        document.getElementById('modalTitulo').style.color = cor;
+        document.getElementById('modalMensagem').innerText = mensagem;
+        document.getElementById('modalSucesso').style.display = 'flex';
+        redirecionarAposModal = recarregar;
+    }
+
+    function fecharModal() {
+        document.getElementById('modalSucesso').style.display = 'none';
+        if (redirecionarAposModal) location.reload();
+    }
+
+    function verificarOutro(valor, boxId) {
+        document.getElementById(boxId).style.display = (valor === "outro") ? "block" : "none";
     }
 
     function validarEPassar() {
@@ -197,9 +237,35 @@
         const inputOutro = document.getElementById('profissionalOutro');
         const hiddenInput = document.getElementById('profissional');
         let nomeFinal = (select.value === "outro") ? inputOutro.value.trim() : select.value;
-        if (!nomeFinal) { alert("Por favor, selecione ou digite seu nome."); return; }
+        if (!nomeFinal) { 
+            mostrarModal("Atenção", "Identificação do avaliador é obrigatória!", "⚠️", "#ffc107"); 
+            return; 
+        }
         hiddenInput.value = nomeFinal;
         nextSec(2);
+    }
+
+    function validarPasso2() {
+        const selectU = document.getElementById('unidadeSelect');
+        const inputUOutro = document.getElementById('unidadeOutro');
+        const hiddenU = document.getElementById('unidade');
+        
+        let unidadeFinal = (selectU.value === "outro") ? inputUOutro.value.trim() : selectU.value;
+
+        if (!document.getElementById('genero').value || !document.getElementById('idade').value || !unidadeFinal) {
+            mostrarModal("Atenção", "Gênero, Idade e Unidade são obrigatórios!", "⚠️", "#ffc107");
+            return;
+        }
+        hiddenU.value = unidadeFinal;
+        nextSec(3);
+    }
+
+    function validarPasso3() {
+        if (!document.getElementById('tipoProblema').value) {
+            mostrarModal("Atenção", "Selecione o que está sendo avaliado!", "⚠️", "#ffc107");
+            return;
+        }
+        nextSec(4);
     }
 
     const dentesAdulto = [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28, 48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38];
@@ -253,11 +319,16 @@
         const tipo = document.getElementById('tipoProblema').value;
         const dente = document.getElementById('numDente').value;
 
-        if (!foto || (tipo === 'carie' && !dente)) { alert("Foto e dente são obrigatórios!"); return; }
+        if (!foto) { mostrarModal("Erro", "A foto é obrigatória!", "❌", "#dc3545"); return; }
+        if (tipo === 'carie') {
+            if (!document.getElementById('superficie').value || !document.getElementById('icdasLesao').value || !document.getElementById('icdasRest').value) {
+                mostrarModal("Erro", "Campos obrigatórios faltando (Dente, Superfície ou ICDAS)!", "❌", "#dc3545"); return;
+            }
+        }
 
         const btnA = document.getElementById('btnAdd'); const btnF = document.getElementById('btnFim');
         btnA.disabled = true; btnF.disabled = true;
-        document.getElementById('status').innerText = "⏳ Enviando dados...";
+        document.getElementById('status').innerText = "⏳ Enviando dados... Aguarde.";
 
         const reader = new FileReader();
         reader.readAsDataURL(foto);
@@ -271,7 +342,6 @@
                 genero: document.getElementById('genero').value || "NaN",
                 idade: document.getElementById('idade').value || "NaN",
                 unidade: document.getElementById('unidade').value || "NaN",
-                // Se for lesão, enviamos "N/A", se for cárie, pegamos o valor do campo
                 denticao: tipo === 'lesao' ? "N/A" : document.getElementById('tipoDenticao').value,
                 tipo: tipo,
                 dente: tipo === 'lesao' ? "N/A" : dente,
@@ -284,15 +354,22 @@
 
             try {
                 await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                
                 if (manter) {
-                    alert("✅ Registrado!");
+                    mostrarModal("Sucesso!", "A foto foi enviada. Você pode adicionar outra para o mesmo paciente.");
                     document.getElementById('foto').value = "";
                     document.getElementById('preview').style.display = 'none';
                     document.getElementById('txtFoto').style.display = 'flex';
                     btnA.disabled = false; btnF.disabled = false;
                     document.getElementById('status').innerText = "";
-                } else { alert("✅ Paciente finalizado!"); location.reload(); }
-            } catch (e) { alert("Erro de conexão."); btnA.disabled = false; btnF.disabled = false; }
+                } else { 
+                    mostrarModal("Concluído!", "Paciente finalizado com sucesso. O sistema irá reiniciar.", "✅", "var(--success)", true);
+                }
+            } catch (e) { 
+                mostrarModal("Erro", "Erro ao enviar dados. Verifique a conexão.", "❌", "#dc3545");
+                btnA.disabled = false; btnF.disabled = false; 
+                document.getElementById('status').innerText = "";
+            }
         };
     }
 </script>
