@@ -40,7 +40,6 @@
         .step-indicator { text-align: center; font-size: 0.65rem; color: #999; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
         .info-lesao { background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; font-size: 0.8rem; margin-bottom: 10px; display: none; }
 
-        /* ESTILO DO MODAL VISUAL */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 30px; border-radius: 15px; text-align: center; max-width: 80%; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: scaleUp 0.3s ease; }
         .modal-content h3 { color: var(--success); margin-top: 0; }
@@ -201,6 +200,9 @@
             <img id="preview">
         </div>
 
+        <label>Comentários (Opcional)</label>
+        <textarea id="comentario" rows="3" placeholder="Adicione observações relevantes aqui..."></textarea>
+
         <div class="btn-group">
             <button class="btn-prev" onclick="nextSec(3)">Voltar</button>
             <button class="btn-add" id="btnAdd" onclick="enviar(true)">Adicionar outra imagem</button>
@@ -249,7 +251,6 @@
         const selectU = document.getElementById('unidadeSelect');
         const inputUOutro = document.getElementById('unidadeOutro');
         const hiddenU = document.getElementById('unidade');
-        
         let unidadeFinal = (selectU.value === "outro") ? inputUOutro.value.trim() : selectU.value;
 
         if (!document.getElementById('genero').value || !document.getElementById('idade').value || !unidadeFinal) {
@@ -348,18 +349,19 @@
                 superficie: tipo === 'lesao' ? "N/A" : document.getElementById('superficie').value,
                 icdasLesao: tipo === 'lesao' ? "N/A" : document.getElementById('icdasLesao').value,
                 icdasRest: tipo === 'lesao' ? "N/A" : document.getElementById('icdasRest').value,
+                comentario: document.getElementById('comentario').value,
                 foto: reader.result.split(',')[1],
                 nomeArquivo: tipo === 'carie' ? `C_ICDAS${document.getElementById('icdasLesao').value}_${getIniciais(prof)}_${ts}.jpg` : `L_${getIniciais(prof)}_${ts}.jpg`
             };
 
             try {
                 await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                
                 if (manter) {
                     mostrarModal("Sucesso!", "A foto foi enviada. Você pode adicionar outra para o mesmo paciente.");
                     document.getElementById('foto').value = "";
                     document.getElementById('preview').style.display = 'none';
                     document.getElementById('txtFoto').style.display = 'flex';
+                    document.getElementById('comentario').value = "";
                     btnA.disabled = false; btnF.disabled = false;
                     document.getElementById('status').innerText = "";
                 } else { 
