@@ -28,6 +28,8 @@
         .cat-moderada { border-left: 4px solid #fd7e14; background: #fff9f4; }
         .cat-severa { border-left: 4px solid #dc3545; background: #fff5f6; }
 
+        .img-counter { background: #e7f3ff; color: #0056b3; padding: 10px; border-radius: 8px; font-size: 0.9rem; font-weight: bold; text-align: center; margin-bottom: 15px; border: 1px solid #b3d7ff; }
+
         .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
         .btn-row { display: flex; gap: 10px; }
         button { flex: 1; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
@@ -141,6 +143,10 @@
     </div>
 
     <div id="sec4" class="section">
+        <div id="contadorImagens" class="img-counter" style="display: none;">
+            📸 Imagens enviadas deste paciente: <span id="numContador">0</span>
+        </div>
+
         <h2 id="tituloFinal">Detalhes e Captura</h2>
         <div id="msgLesao" class="info-lesao">Você selecionou <b>Lesão Bucal</b>.</div>
         
@@ -220,6 +226,7 @@
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzwLBI0EKjtXfRc81h1omtcQfQ5k_k08Pqxs3cMsbB1R3acZ2KEJvd4pfKknWNWVRvk1Q/exec";
     let redirecionarAposModal = false;
+    let contadorFotos = 0;
 
     function mostrarModal(titulo, mensagem, emoji = "✅", cor = "var(--success)", recarregar = false) {
         document.getElementById('modalEmoji').innerText = emoji;
@@ -248,10 +255,7 @@
         const inputOutro = document.getElementById('profissionalOutro');
         const hiddenInput = document.getElementById('profissional');
         let nomeFinal = (select.value === "outro") ? inputOutro.value.trim() : select.value;
-        if (!nomeFinal) { 
-            mostrarModal("Atenção", "Identificação do avaliador é obrigatória!", "⚠️", "#ffc107"); 
-            return; 
-        }
+        if (!nomeFinal) { mostrarModal("Atenção", "Identificação do avaliador é obrigatória!", "⚠️", "#ffc107"); return; }
         hiddenInput.value = nomeFinal;
         nextSec(2);
     }
@@ -261,10 +265,8 @@
         const inputUOutro = document.getElementById('unidadeOutro');
         const hiddenU = document.getElementById('unidade');
         let unidadeFinal = (selectU.value === "outro") ? inputUOutro.value.trim() : selectU.value;
-
         if (!document.getElementById('genero').value || !document.getElementById('idade').value || !unidadeFinal) {
-            mostrarModal("Atenção", "Gênero, Idade e Unidade são obrigatórios!", "⚠️", "#ffc107");
-            return;
+            mostrarModal("Atenção", "Gênero, Idade e Unidade são obrigatórios!", "⚠️", "#ffc107"); return;
         }
         hiddenU.value = unidadeFinal;
         nextSec(3);
@@ -272,21 +274,13 @@
 
     function validarPasso3() {
         if (!document.getElementById('tipoProblema').value) {
-            mostrarModal("Atenção", "Selecione o que está sendo avaliado!", "⚠️", "#ffc107");
-            return;
+            mostrarModal("Atenção", "Selecione o que está sendo avaliado!", "⚠️", "#ffc107"); return;
         }
         nextSec(4);
     }
 
-    // LISTAS ATUALIZADAS CONFORME IMAGENS DE REFERÊNCIA
-    const dentesAdulto = [
-        11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28,
-        31, 32, 33, 34, 35, 36, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48
-    ];
-    const dentesCrianca = [
-        55, 54, 53, 52, 51, 61, 62, 63, 64, 65,
-        85, 84, 83, 82, 81, 71, 72, 73, 74, 75
-    ];
+    const dentesAdulto = [11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48];
+    const dentesCrianca = [51, 52, 53, 54, 55, 61, 62, 63, 64, 65, 71, 72, 73, 74, 75, 81, 82, 83, 82, 85];
 
     function atualizarListaDentes() {
         const tipo = document.getElementById('tipoDenticao').value;
@@ -372,8 +366,13 @@
 
             try {
                 await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                
+                contadorFotos++; // Incrementa sempre que o envio tem sucesso
+                document.getElementById('contadorImagens').style.display = 'block';
+                document.getElementById('numContador').innerText = contadorFotos;
+
                 if (manter) {
-                    mostrarModal("Sucesso!", "A foto foi enviada. Você pode adicionar outra para o mesmo paciente.");
+                    mostrarModal("Sucesso!", "Imagem enviada. Você pode adicionar outra.");
                     document.getElementById('foto').value = "";
                     document.getElementById('preview').style.display = 'none';
                     document.getElementById('txtFoto').style.display = 'flex';
@@ -381,7 +380,8 @@
                     btnA.disabled = false; btnF.disabled = false;
                     document.getElementById('status').innerText = "";
                 } else { 
-                    mostrarModal("Concluído!", "Paciente finalizado com sucesso. O sistema irá reiniciar.", "✅", "var(--success)", true);
+                    // MOSTRA O TOTAL DE FOTOS NO MODAL FINAL
+                    mostrarModal("Concluído!", "Paciente finalizado com sucesso. Total de " + contadorFotos + " foto(s) enviada(s).", "✅", "var(--success)", true);
                 }
             } catch (e) { 
                 mostrarModal("Erro", "Erro ao enviar dados. Verifique a conexão.", "❌", "#dc3545");
