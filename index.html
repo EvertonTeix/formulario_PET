@@ -1,408 +1,770 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Coleta - PET Saúde</title>
     <style>
-        :root { --primary: #0056b3; --success: #28a745; --bg: #f8f9fa; --border: #dee2e6; }
-        body { font-family: 'Segoe UI', sans-serif; padding: 15px; background: var(--bg); color: #333; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
-        .header-title { text-align: center; margin-bottom: 20px; }
-        .header-title h1 { color: var(--primary); font-size: 1.3rem; margin-bottom: 8px; }
-        .header-title p { font-size: 0.85rem; color: #666; line-height: 1.4; margin: 0; }
-        .section { display: none; }
-        .active { display: block; }
-        h2 { color: var(--primary); font-size: 1.1rem; border-bottom: 2px solid #eee; padding-bottom: 8px; margin-top: 0; }
-        label { display: block; margin: 12px 0 5px; font-weight: bold; font-size: 0.85rem; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
-        
-        .guia-icdas { background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin: 15px 0; }
-        .guia-header { background: #e9ecef; padding: 8px; font-weight: bold; font-size: 0.8rem; text-align: center; border-bottom: 1px solid var(--border); }
-        .icdas-row { padding: 8px 12px; border-bottom: 1px solid #f1f1f1; font-size: 0.75rem; line-height: 1.4; }
-        .icdas-row:last-child { border-bottom: none; }
-        .icdas-row b { display: block; color: var(--primary); margin-bottom: 2px; }
-        
-        .cat-saudavel { border-left: 4px solid #6c757d; }
-        .cat-inicial { border-left: 4px solid #ffc107; background: #fffcf2; }
-        .cat-moderada { border-left: 4px solid #fd7e14; background: #fff9f4; }
-        .cat-severa { border-left: 4px solid #dc3545; background: #fff5f6; }
+        :root {
+            --primary: #0056b3;
+            --success: #28a745;
+            --bg: #f8f9fa;
+            --border: #dee2e6;
+        }
 
-        .img-counter { background: #e7f3ff; color: #0056b3; padding: 10px; border-radius: 8px; font-size: 0.9rem; font-weight: bold; text-align: center; margin-bottom: 15px; border: 1px solid #b3d7ff; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            padding: 15px;
+            background: var(--bg);
+            color: #333;
+        }
 
-        .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-        .btn-row { display: flex; gap: 10px; }
-        button { flex: 1; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
-        .btn-next { background: var(--primary); color: white; }
-        .btn-prev { background: #e0e0e0; color: #333; }
-        .btn-save { background: var(--success); color: white; }
-        .btn-add { background: #6f42c1; color: white; }
-        .btn-exit { background: #dc3545; color: white; }
-        
-        .file-box { border: 2px dashed var(--primary); padding: 15px; text-align: center; border-radius: 8px; background: #f0f7ff; cursor: pointer; margin-top: 10px; min-height: 100px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        #preview { width: 100%; border-radius: 8px; display: none; margin-top: 10px; }
-        .step-indicator { text-align: center; font-size: 0.65rem; color: #999; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        .info-lesao { background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; font-size: 0.8rem; margin-bottom: 10px; display: none; }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: auto;
+        }
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 30px; border-radius: 15px; text-align: center; max-width: 80%; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: scaleUp 0.3s ease; }
-        .modal-content h3 { color: var(--success); margin-top: 0; }
-        .modal-content p { font-size: 1rem; color: #444; }
-        .modal-btn { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
-        @keyframes scaleUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .header-title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header-title h1 {
+            color: var(--primary);
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        .header-title p {
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        h2 {
+            color: var(--primary);
+            font-size: 1.1rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 8px;
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            margin: 12px 0 5px;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .guia-icdas {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .guia-header {
+            background: #e9ecef;
+            padding: 8px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .icdas-row {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f1f1f1;
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .icdas-row:last-child {
+            border-bottom: none;
+        }
+
+        .icdas-row b {
+            display: block;
+            color: var(--primary);
+            margin-bottom: 2px;
+        }
+
+        .cat-saudavel {
+            border-left: 4px solid #6c757d;
+        }
+
+        .cat-inicial {
+            border-left: 4px solid #ffc107;
+            background: #fffcf2;
+        }
+
+        .cat-moderada {
+            border-left: 4px solid #fd7e14;
+            background: #fff9f4;
+        }
+
+        .cat-severa {
+            border-left: 4px solid #dc3545;
+            background: #fff5f6;
+        }
+
+        .img-counter {
+            background: #e7f3ff;
+            color: #0056b3;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+            border: 1px solid #b3d7ff;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-next {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-prev {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-save {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-add {
+            background: #6f42c1;
+            color: white;
+        }
+
+        .btn-exit {
+            background: #dc3545;
+            color: white;
+        }
+
+        .file-box {
+            border: 2px dashed var(--primary);
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            background: #f0f7ff;
+            cursor: pointer;
+            margin-top: 10px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        #preview {
+            width: 100%;
+            border-radius: 8px;
+            display: none;
+            margin-top: 10px;
+        }
+
+        .step-indicator {
+            text-align: center;
+            font-size: 0.65rem;
+            color: #999;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-lesao {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 80%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            animation: scaleUp 0.3s ease;
+        }
+
+        .modal-content h3 {
+            color: var(--success);
+            margin-top: 0;
+        }
+
+        .modal-content p {
+            font-size: 1rem;
+            color: #444;
+            }
+
+        .modal-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        @keyframes scaleUp {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
+
 <body>
 
-<div id="modalSucesso" class="modal-overlay">
-    <div class="modal-content">
-        <div id="modalEmoji" style="font-size: 50px;">✅</div>
-        <h3 id="modalTitulo">Sucesso!</h3>
-        <p id="modalMensagem">Dados enviados corretamente.</p>
-        <button class="modal-btn" onclick="fecharModal()">OK</button>
-    </div>
-</div>
-
-<div class="card">
-    <div class="header-title">
-        <h1>Coleta de Imagens Odontológicas para Análise de Problemas Bucais</h1>
-        <p>PET Saúde Digital GAT 10</p>
-    </div>
-
-    <div class="step-indicator" id="stepTag">Passo 1 de 4</div>
-
-    <div id="sec1" class="section active">
-        <h2>Identificação do Avaliador</h2>
-        <label>Selecione seu Nome *</label>
-        <select id="selectProfissional" onchange="verificarOutro(this.value, 'boxOutro')">
-            <option value="" disabled selected>Clique para selecionar...</option>
-            <option value="Kaio Iury Luz Fernandes">Kaio Iury Luz Fernandes</option>
-            <option value="Lívia Maria Martins Aragão">Lara Gabriela Aquino Rego</option>
-            <option value="Nycollas Fernandes de Carvalho">Nycollas Fernandes de Carvalho</option>
-            <option value="Thyciana Rodrigues Ribeiro">Thyciana Rodrigues Ribeiro</option>
-            <option value="Welison Nascimento Moreira">Welison Nascimento Moreira</option>
-            <option value="outro">Outro (Digitar nome)</option>
-        </select>
-        <div id="boxOutro" style="display: none; margin-top: 10px;">
-            <label>Digite seu nome completo *</label>
-            <input type="text" id="profissionalOutro" placeholder="Escreva seu nome aqui">
-        </div>
-        <input type="hidden" id="profissional">
-        <div class="btn-group">
-            <button class="btn-next" onclick="validarEPassar()">Próximo: Dados do Paciente</button>
+    <div id="modalSucesso" class="modal-overlay">
+        <div class="modal-content">
+            <div id="modalEmoji" style="font-size: 50px;">✅</div>
+            <h3 id="modalTitulo">Sucesso!</h3>
+            <p id="modalMensagem">Dados enviados corretamente.</p>
+            <button class="modal-btn" onclick="fecharModal()">OK</button>
         </div>
     </div>
 
-    <div id="sec2" class="section">
-        <h2>Dados do Paciente</h2>
-        <label>Nome Completo *</label>
-        <input type="text" id="paciente" placeholder="Ex: João Silva">
-        <label>SUS ou CPF</label>
-        <input type="text" id="documento" placeholder="Apenas números">
-        <label>Gênero *</label>
-        <select id="genero">
-            <option value="" disabled selected>Selecionar...</option>
-            <option value="Masculino">Masculino</option>
-            <option value="Feminino">Feminino</option>
-            <option value="Outro">Outro</option>
-        </select>
-        <label>Idade *</label>
-        <input type="number" id="idade">
-        <label>Unidade *</label>
-        <select id="unidadeSelect" onchange="verificarOutro(this.value, 'boxUnidadeOutro')">
-            <option value="" disabled selected>Selecionar...</option>
-            <option value="Calibração">Calibração</option>
-            <option value="Posto de Saúde Maria José Turbay Barreira">Posto de Saúde Maria José Turbay Barreira</option>
-            <option value="Posto de Saúde Roberto da Silva Bruno">Posto de Saúde Roberto da Silva Bruno</option>
-            <option value="outro">Outro (Digitar local)</option>
-        </select>
-        <div id="boxUnidadeOutro" style="display: none; margin-top: 10px;">
-            <label>Digite o nome da Unidade *</label>
-            <input type="text" id="unidadeOutro" placeholder="Escreva o local aqui">
-        </div>
-        <input type="hidden" id="unidade">
-
-        <div class="btn-group">
-            <button class="btn-prev" onclick="nextSec(1)">Voltar</button>
-            <button class="btn-next" onclick="validarPasso2()">Próximo: Problema</button>
-        </div>
-    </div>
-
-    <div id="sec3" class="section">
-        <h2>Avaliação</h2>
-        <label>O que está sendo avaliado? *</label>
-        <select id="tipoProblema">
-            <option value="" disabled selected>Selecione...</option>
-            <option value="carie">Cárie Dentária</option>
-            <option value="lesao">Lesão Bucal (não cariosa)</option>
-        </select>
-        <div class="btn-group">
-            <button class="btn-prev" onclick="nextSec(2)">Voltar</button>
-            <button class="btn-next" onclick="validarPasso3()">Próximo: Capturar</button>
-        </div>
-    </div>
-
-    <div id="sec4" class="section">
-        <div id="contadorImagens" class="img-counter" style="display: none;">
-            📸 Imagens enviadas deste paciente: <span id="numContador">0</span>
+    <div class="card">
+        <div class="header-title">
+            <h1>Coleta de Imagens Odontológicas para Análise de Problemas Bucais</h1>
+            <p>PET Saúde Digital GAT 10</p>
         </div>
 
-        <h2 id="tituloFinal">Detalhes e Captura</h2>
-        <div id="msgLesao" class="info-lesao">Você selecionou <b>Lesão Bucal</b>.</div>
-        
-        <div id="camposCarie">
-            <label>Tipo de Dentição *</label>
-            <select id="tipoDenticao" onchange="atualizarListaDentes()">
-                <option value="adulto" selected>Adulto (Permanente)</option>
-                <option value="crianca">Criança (Decíduo)</option>
+        <div class="step-indicator" id="stepTag">Passo 1 de 4</div>
+
+        <!-- PASSO 1 -->
+        <div id="sec1" class="section active">
+            <h2>Identificação do Avaliador</h2>
+            <label>Selecione seu Nome *</label>
+            <select id="selectProfissional" onchange="verificarOutro(this.value, 'boxOutro')">
+                <option value="" disabled selected>Clique para selecionar...</option>
+                <option value="Kaio Iury Luz Fernandes">Kaio Iury Luz Fernandes</option>
+                <option value="Lara Gabriela Aquino Rego">Lara Gabriela Aquino Rego</option>
+                <option value="Nycollas Fernandes de Carvalho">Nycollas Fernandes de Carvalho</option>
+                <option value="Thyciana Rodrigues Ribeiro">Thyciana Rodrigues Ribeiro</option>
+                <option value="Welison Nascimento Moreira">Welison Nascimento Moreira</option>
+                <option value="outro">Outro (Digitar nome)</option>
             </select>
-            <label>Número do Dente *</label>
-            <select id="numDente"></select>
-            <label>Superfície *</label>
-            <select id="superficie">
-                <option value="" disabled selected>Selecionar...</option>
-                <option value="M">Mesial</option>
-                <option value="O/I">Oclusal/Incisal</option>
-                <option value="D">Distal</option>
-                <option value="V">Vestibular</option>
-                <option value="P/L">Palatina/Lingual</option>
-            </select>
-
-            <div class="guia-icdas">
-                <div class="guia-header">GUIA ICDAS - LESÃO DE CÁRIE</div>
-                <div class="icdas-row cat-saudavel"><b>0: Saudável</b>0: Dente hígido.</div>
-                <div class="icdas-row cat-inicial"><b>1 e 2: Lesão Inicial</b>1: Opacidade branca visível após secagem, restrita ao fundo do sulco<br>2: Opacidade branca visível sem secagem, invadindo as vertentes</div>
-                <div class="icdas-row cat-moderada"><b>3 e 4: Lesão Moderada</b>3: Microcavidade restrita ao esmalte<br>4: Sombra cinzenta ou marrom no esmalte</div>
-                <div class="icdas-row cat-severa"><b>5 e 6: Lesão Severa</b>5: Cavidade distinta com dentina exposta até metade da superfície<br>6: Cavidade extensa com dentina visível mais de 50%</div>
-            </div>  
-
-            <label>ICDAS – Lesão *</label>
-            <select id="icdasLesao">
-                <option value="" disabled selected>Selecionar...</option>
-                <option value="0">0 = Saudável</option>
-                <option value="1-2">1-2 = Lesão Inicial</option>
-                <option value="3-4">3-4 = Lesão Moderada</option>
-                <option value="5-6">5-6 = Lesão Severa</option>
-            </select>
-
-            <label>ICDAS – Restauração e Selante *</label>
-            <select id="icdasRest">
-                <option value="" disabled selected>Selecionar...</option>
-                <option value="0">0 = Nada</option>
-                <option value="1">1 = Selante parcial</option>
-                <option value="2">2 = Selante completo</option>
-                <option value="3">3 = Restauração cor dente</option>
-                <option value="4">4 = Amálgama</option>
-                <option value="5">5 = Coroa aço/policarboxilato</option>
-                <option value="6">6 = Coroa/Faceta nobre</option>
-                <option value="7">7 = Restauração perdida/fraturada</option>
-                <option value="8">8 = Temporária</option>
-                <option value="9">9 = Outra</option>
-            </select>
-        </div>
-
-        <label>Anexar Foto *</label>
-        <div class="file-box" onclick="document.getElementById('foto').click()">
-            <span id="txtFoto">📸 Clique para Câmera ou Galeria</span>
-            <input type="file" id="foto" style="display:none" onchange="previewImg()">
-            <img id="preview">
-        </div>
-
-        <label>Comentários (Opcional)</label>
-        <textarea id="comentario" rows="3" placeholder="Adicione observações relevantes aqui..."></textarea>
-
-        <div class="btn-group">
-            <div class="btn-row">
-                <button class="btn-prev" onclick="nextSec(3)">Voltar</button>
-                <button class="btn-add" id="btnAdd" onclick="enviar(true)">Adicionar outra imagem</button>
+            <div id="boxOutro" style="display: none; margin-top: 10px;">
+                <label>Digite seu nome completo *</label>
+                <input type="text" id="profissionalOutro" placeholder="Escreva seu nome aqui">
             </div>
-            <button class="btn-save" id="btnFim" onclick="enviar(false)">FINALIZAR PACIENTE</button>
-            <button class="btn-exit" onclick="confirmarSair()">SAIR / NOVO PACIENTE</button>
+            <input type="hidden" id="profissional">
+            <div class="btn-group">
+                <button class="btn-next" onclick="validarEPassar()">Próximo: Dados do Paciente</button>
+            </div>
         </div>
-        <p id="status" style="text-align: center; font-size: 0.9rem; font-weight: bold; color: var(--primary); margin-top: 10px;"></p>
+
+        <!-- PASSO 2 -->
+        <div id="sec2" class="section">
+            <h2>Dados do Paciente</h2>
+            <label>Nome Completo *</label>
+            <input type="text" id="paciente" placeholder="Ex: João Silva">
+            <label>SUS ou CPF</label>
+            <input type="text" id="documento" placeholder="Apenas números">
+            <label>Gênero *</label>
+            <select id="genero">
+                <option value="" disabled selected>Selecionar...</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Feminino">Feminino</option>
+                <option value="Outro">Outro</option>
+            </select>
+            <label>Idade *</label>
+            <input type="number" id="idade">
+            <label>Unidade *</label>
+            <select id="unidadeSelect" onchange="verificarOutro(this.value, 'boxUnidadeOutro')">
+                <option value="" disabled selected>Selecionar...</option>
+                <option value="Calibração">Calibração</option>
+                <option value="Posto de Saúde Maria José Turbay Barreira">Posto de Saúde Maria José Turbay Barreira</option>
+                <option value="Posto de Saúde Roberto da Silva Bruno">Posto de Saúde Roberto da Silva Bruno</option>
+                <option value="outro">Outro (Digitar local)</option>
+            </select>
+            <div id="boxUnidadeOutro" style="display: none; margin-top: 10px;">
+                <label>Digite o nome da Unidade *</label>
+                <input type="text" id="unidadeOutro" placeholder="Escreva o local aqui">
+            </div>
+            <input type="hidden" id="unidade">
+
+            <div class="btn-group">
+                <button class="btn-prev" onclick="nextSec(1)">Voltar</button>
+                <button class="btn-next" onclick="validarPasso2()">Próximo: Problema</button>
+            </div>
+        </div>
+
+        <!-- PASSO 3 -->
+        <div id="sec3" class="section">
+            <h2>Avaliação</h2>
+            <label>O que está sendo avaliado? *</label>
+            <select id="tipoProblema">
+                <option value="" disabled selected>Selecione...</option>
+                <option value="carie">Cárie Dentária</option>
+                <option value="lesao">Lesão Bucal (não cariosa)</option>
+            </select>
+            <div class="btn-group">
+                <button class="btn-prev" onclick="nextSec(2)">Voltar</button>
+                <button class="btn-next" onclick="validarPasso3()">Próximo: Capturar</button>
+            </div>
+        </div>
+
+        <!-- PASSO 4 -->
+        <div id="sec4" class="section">
+            <div id="contadorImagens" class="img-counter" style="display: none;">
+                📸 Imagens enviadas deste paciente: <span id="numContador">0</span>
+            </div>
+
+            <h2 id="tituloFinal">Detalhes e Captura</h2>
+            <div id="msgLesao" class="info-lesao">Você selecionou <b>Lesão Bucal</b>.</div>
+            
+            <!-- 🌟 CAMPOS DE LESÃO CORRIGIDOS -->
+            <div id="camposLesao" style="display: none;">
+                <label>Local de Coleta *</label>
+                <select id="localColetaSelect" onchange="verificarOutro(this.value, 'boxLocalColetaOutro')">
+                    <option value="" disabled selected>Selecionar...</option>
+                    <option value="Calibração">Calibração</option>
+                    <option value="Posto de Saúde Maria José Turbay Barreira">Posto de Saúde Maria José Turbay Barreira</option>
+                    <option value="Posto de Saúde Roberto da Silva Bruno">Posto de Saúde Roberto da Silva Bruno</option>
+                    <option value="outro">Outro (Digitar local)</option>
+                </select>
+                <div id="boxLocalColetaOutro" style="display: none; margin-top: 10px;">
+                    <label>Digite o nome do Local de Coleta *</label>
+                    <input type="text" id="localColetaOutro" placeholder="Escreva o local aqui">
+                </div>
+
+                <label style="font-weight: bold; color: #334155; display: block; margin-top: 12px;">
+                    Termo de Consentimento (TCLE) <span style="color: red;">*</span>
+                </label>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 5px;">
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #656e7b; cursor: pointer; font-weight: normal; margin: 0;">
+                        <input type="radio" name="tcle" value="assinou" style="width: auto;"> Paciente assinou TCLE
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #656e7b; cursor: pointer; font-weight: normal; margin: 0;">
+                        <input type="radio" name="tcle" value="banco_imagens" style="width: auto;"> Paciente de banco de imagens
+                    </label>
+                </div>
+
+                <label>Descrição da Lesão (Opcional)</label>
+                <textarea id="descricaoLesao" rows="3" placeholder="Descreva as características visuais da lesão..."></textarea>
+
+                <label style="font-weight: bold; color: #334155; margin-top: 12px;">
+                    Biópsia <span style="color: red;">*</span>
+                </label>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 5px;">
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #656e7b; cursor: pointer; font-weight: normal; margin: 0;">
+                        <input type="radio" name="biopsia" value="nao_precisou" style="width: auto;"> Não Foi Necessário
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #656e7b; cursor: pointer; font-weight: normal; margin: 0;">
+                        <input type="radio" name="biopsia" value="aguardando" style="width: auto;"> Aguardando Resultados
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #656e7b; cursor: pointer; font-weight: normal; margin: 0;">
+                        <input type="radio" name="biopsia" value="realizada" style="width: auto;"> Biópsia Realizada
+                    </label>
+                </div>
+
+                <!-- Campo dinâmico para Laudo se a biópsia foi realizada -->
+                <div id="boxLaudoBiopsia" style="display: none; margin-top: 10px;">
+                    <label>Laudo da Biópsia (Opcional)</label>
+                    <textarea id="laudoBiopsia" rows="3" placeholder="Insira o resultado ou laudo detalhado..."></textarea>
+                </div>
+
+                <label>Diagnóstico/Hipótese Diagnóstica (Opcional)</label>
+                <textarea id="hipoteseDiagnostica" rows="3" placeholder="Insira o diagnóstico ou a hipótese diagnóstica..."></textarea>
+            </div>
+
+            <!-- CAMPOS DE CÁRIE -->
+            <div id="camposCarie">
+                <label>Tipo de Dentição *</label>
+                <select id="tipoDenticao" onchange="atualizarListaDentes()">
+                    <option value="adulto" selected>Adulto (Permanente)</option>
+                    <option value="crianca">Criança (Decíduo)</option>
+                </select>
+                <label>Número do Dente *</label>
+                <select id="numDente"></select>
+                <label>Superfície *</label>
+                <select id="superficie">
+                    <option value="" disabled selected>Selecionar...</option>
+                    <option value="M">Mesial</option>
+                    <option value="O/I">Oclusal/Incisal</option>
+                    <option value="D">Distal</option>
+                    <option value="V">Vestibular</option>
+                    <option value="P/L">Palatina/Lingual</option>
+                </select>
+
+                <div class="guia-icdas">
+                    <div class="guia-header">GUIA ICDAS - LESÃO DE CÁRIE</div>
+                    <div class="icdas-row cat-saudavel"><b>0: Saudável</b>0: Dente hígido.</div>
+                    <div class="icdas-row cat-inicial"><b>1 e 2: Lesão Inicial</b>1: Opacidade branca visível após secagem, restrita ao fundo do sulco<br>2: Opacidade branca visível sem secagem, invadindo as vertentes</div>
+                    <div class="icdas-row cat-moderada"><b>3 e 4: Lesão Moderada</b>3: Microcavidade restrita ao esmalte<br>4: Sombra cinzenta ou marrom no esmalte</div>
+                    <div class="icdas-row cat-severa"><b>5 e 6: Lesão Severa</b>5: Cavidade distinta com dentina exposta até metade da superfície<br>6: Cavidade extensa com dentina visível mais de 50%</div>
+                </div>
+
+                <label>ICDAS – Lesão *</label>
+                <select id="icdasLesao">
+                    <option value="" disabled selected>Selecionar...</option>
+                    <option value="0">0 = Saudável</option>
+                    <option value="1-2">1-2 = Lesão Inicial</option>
+                    <option value="3-4">3-4 = Lesão Moderada</option>
+                    <option value="5-6">5-6 = Lesão Severa</option>
+                </select>
+
+                <label>ICDAS – Restauração e Selante *</label>
+                <select id="icdasRest">
+                    <option value="" disabled selected>Selecionar...</option>
+                    <option value="0">0 = Nada</option>
+                    <option value="1">1 = Selante parcial</option>
+                    <option value="2">2 = Selante completo</option>
+                    <option value="3">3 = Restauração cor dente</option>
+                    <option value="4">4 = Amálgama</option>
+                    <option value="5">5 = Coroa aço/policarboxilato</option>
+                    <option value="6">6 = Coroa/Faceta nobre</option>
+                    <option value="7">7 = Restauração perdida/fraturada</option>
+                    <option value="8">8 = Temporária</option>
+                    <option value="9">9 = Outra</option>
+                </select>
+            </div>
+
+            <label>Anexar Foto *</label>
+            <div class="file-box" onclick="document.getElementById('foto').click()">
+                <span id="txtFoto">Clique para Câmera ou Galeria</span>
+                <input type="file" id="foto" accept="image/*" style="display:none" onchange="previewImg()">
+                <img id="preview" alt="Preview">
+            </div>
+
+            <label>Comentários (Opcional)</label>
+            <textarea id="comentario" rows="3" placeholder="Adicione observações relevantes aqui..."></textarea>
+
+            <div class="btn-group">
+                <div class="btn-row">
+                    <button class="btn-prev" onclick="nextSec(3)">Voltar</button>
+                    <button class="btn-add" id="btnAdd" onclick="enviar(true)">Adicionar outra imagem</button>
+                </div>
+                <button class="btn-save" id="btnFim" onclick="enviar(false)">FINALIZAR PACIENTE</button>
+                <button class="btn-exit" onclick="confirmarSair()">SAIR / NOVO PACIENTE</button>
+            </div>
+            <p id="status" style="text-align: center; font-size: 0.9rem; font-weight: bold; color: var(--primary); margin-top: 10px;"></p>
+        </div>
     </div>
-</div>
 
-<script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzwLBI0EKjtXfRc81h1omtcQfQ5k_k08Pqxs3cMsbB1R3acZ2KEJvd4pfKknWNWVRvk1Q/exec";
-    let redirecionarAposModal = false;
-    let contadorFotos = 0;
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzwLBI0EKjtXfRc81h1omtcQfQ5k_k08Pqxs3cMsbB1R3acZ2KEJvd4pfKknWNWVRvk1Q/exec";
+        let redirecionarAposModal = false;
+        let contadorFotos = 0;
 
-    function mostrarModal(titulo, mensagem, emoji = "✅", cor = "var(--success)", recarregar = false) {
-        document.getElementById('modalEmoji').innerText = emoji;
-        document.getElementById('modalTitulo').innerText = titulo;
-        document.getElementById('modalTitulo').style.color = cor;
-        document.getElementById('modalMensagem').innerText = mensagem;
-        document.getElementById('modalSucesso').style.display = 'flex';
-        redirecionarAposModal = recarregar;
-    }
-
-    function fecharModal() {
-        document.getElementById('modalSucesso').style.display = 'none';
-        if (redirecionarAposModal) location.reload();
-    }
-
-    function confirmarSair() {
-        mostrarModal("Sair?", "Deseja realmente sair e iniciar um novo paciente? Os dados não enviados serão perdidos.", "⚠️", "#ffc107", true);
-    }
-
-    function verificarOutro(valor, boxId) {
-        document.getElementById(boxId).style.display = (valor === "outro") ? "block" : "none";
-    }
-
-    function validarEPassar() {
-        const select = document.getElementById('selectProfissional');
-        const inputOutro = document.getElementById('profissionalOutro');
-        const hiddenInput = document.getElementById('profissional');
-        let nomeFinal = (select.value === "outro") ? inputOutro.value.trim() : select.value;
-        if (!nomeFinal) { mostrarModal("Atenção", "Identificação do avaliador é obrigatória!", "⚠️", "#ffc107"); return; }
-        hiddenInput.value = nomeFinal;
-        nextSec(2);
-    }
-
-    function validarPasso2() {
-        const nome = document.getElementById('paciente').value.trim();
-        const gen = document.getElementById('genero').value;
-        const idade = document.getElementById('idade').value;
-        
-        const selectU = document.getElementById('unidadeSelect');
-        const inputUOutro = document.getElementById('unidadeOutro');
-        const hiddenU = document.getElementById('unidade');
-        let unidadeFinal = (selectU.value === "outro") ? inputUOutro.value.trim() : selectU.value;
-
-        // Verificação de todos os campos agora como obrigatórios
-        if (!nome || !gen || !idade || !unidadeFinal) {
-            mostrarModal("Atenção", "Nome, Gênero, Idade e Unidade do paciente são obrigatórios!", "⚠️", "#ffc107"); 
-            return;
-        }
-        hiddenU.value = unidadeFinal;
-        nextSec(3);
-    }
-
-    function validarPasso3() {
-        if (!document.getElementById('tipoProblema').value) {
-            mostrarModal("Atenção", "Selecione o que está sendo avaliado!", "⚠️", "#ffc107"); return;
-        }
-        nextSec(4);
-    }
-
-    const dentesAdulto = [11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48];
-    const dentesCrianca = [51, 52, 53, 54, 55, 61, 62, 63, 64, 65, 71, 72, 73, 74, 75, 81, 82, 83, 84, 85];
-
-    function atualizarListaDentes() {
-        const tipo = document.getElementById('tipoDenticao').value;
-        const selectDente = document.getElementById('numDente');
-        const lista = tipo === 'adulto' ? dentesAdulto : dentesCrianca;
-        selectDente.innerHTML = "";
-        lista.forEach(num => {
-            const option = document.createElement('option');
-            option.value = num;
-            option.textContent = num;
-            selectDente.appendChild(option);
+        // Monitora dinamicamente a exibição da caixa de laudo da biópsia
+        document.addEventListener('change', function(e) {
+            if (e.target && e.target.name === 'biopsia') {
+                document.getElementById('boxLaudoBiopsia').style.display = (e.target.value === 'realizada') ? 'block' : 'none';
+            }
         });
-    }
 
-    atualizarListaDentes();
-
-    function nextSec(n) {
-        if (n === 4) {
-            const tipo = document.getElementById('tipoProblema').value;
-            document.getElementById('camposCarie').style.display = tipo === "lesao" ? 'none' : 'block';
-            document.getElementById('msgLesao').style.display = tipo === "lesao" ? 'block' : 'none';
+        function mostrarModal(titulo, mensagem, emoji = "✅", cor = "var(--success)", recarregar = false) {
+            document.getElementById('modalEmoji').innerText = emoji;
+            document.getElementById('modalTitulo').innerText = titulo;
+            document.getElementById('modalTitulo').style.color = cor;
+            document.getElementById('modalMensagem').innerText = mensagem;
+            document.getElementById('modalSucesso').style.display = 'flex';
+            redirecionarAposModal = recarregar;
         }
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.getElementById('sec' + n).classList.add('active');
-        document.getElementById('stepTag').innerText = "Passo " + n + " de 4";
-        window.scrollTo(0, 0);
-    }
 
-    function previewImg() {
-        const file = document.getElementById('foto').files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = e => {
-                const img = document.getElementById('preview');
-                img.src = e.target.result;
-                img.style.display = 'block';
-                document.getElementById('txtFoto').style.display = 'none';
-            };
-            reader.readAsDataURL(file);
+        function fecharModal() {
+            document.getElementById('modalSucesso').style.display = 'none';
+            if (redirecionarAposModal) location.reload();
         }
-    }
 
-    function getIniciais(nome) { return nome.trim().split(' ').map(n => n[0]).join('').toUpperCase(); }
+        function confirmarSair() {
+            mostrarModal("Sair?", "Deseja realmente sair e iniciar um novo paciente? Os dados não enviados serão perdidos.", "⚠️", "#ffc107", true);
+        }
 
-    async function enviar(manter) {
-        const foto = document.getElementById('foto').files[0];
-        const tipo = document.getElementById('tipoProblema').value;
-        const dente = document.getElementById('numDente').value;
+        function verificarOutro(valor, boxId) {
+            document.getElementById(boxId).style.display = (valor === "outro") ? "block" : "none";
+        }
 
-        if (!foto) { mostrarModal("Erro", "A foto é obrigatória!", "❌", "#dc3545"); return; }
-        if (tipo === 'carie') {
-            if (!document.getElementById('superficie').value || !document.getElementById('icdasLesao').value || !document.getElementById('icdasRest').value) {
-                mostrarModal("Erro", "Campos obrigatórios faltando (Dente, Superfície ou ICDAS)!", "❌", "#dc3545"); return;
+        function validarEPassar() {
+            const select = document.getElementById('selectProfissional');
+            const inputOutro = document.getElementById('profissionalOutro');
+            const hiddenInput = document.getElementById('profissional');
+            let nomeFinal = (select.value === "outro") ? inputOutro.value.trim() : select.value;
+            if (!nomeFinal) { mostrarModal("Atenção", "Identificação do avaliador é obrigatória!", "⚠️", "#ffc107"); return; }
+            hiddenInput.value = nomeFinal;
+            nextSec(2);
+        }
+
+        function validarPasso2() {
+            const nome = document.getElementById('paciente').value.trim();
+            const gen = document.getElementById('genero').value;
+            const idade = document.getElementById('idade').value;
+
+            const selectU = document.getElementById('unidadeSelect');
+            const inputUOutro = document.getElementById('unidadeOutro');
+            const hiddenU = document.getElementById('unidade');
+            let unidadeFinal = (selectU.value === "outro") ? inputUOutro.value.trim() : selectU.value;
+
+            if (!nome || !gen || !idade || !unidadeFinal) {
+                mostrarModal("Atenção", "Nome, Gênero, Idade e Unidade do paciente são obrigatórios!", "⚠️", "#ffc107");
+                return;
+            }
+            hiddenU.value = unityFinal = unidadeFinal;
+            nextSec(3);
+        }
+
+        function validarPasso3() {
+            if (!document.getElementById('tipoProblema').value) {
+                mostrarModal("Atenção", "Selecione o que está sendo avaliado!", "⚠️", "#ffc107"); return;
+            }
+            nextSec(4);
+        }
+
+        const dentesAdulto = [11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48];
+        const dentesCrianca = [51, 52, 53, 54, 55, 61, 62, 63, 64, 65, 71, 72, 73, 74, 75, 81, 82, 83, 84, 85];
+
+        function atualizarListaDentes() {
+            const tipo = document.getElementById('tipoDenticao').value;
+            const selectDente = document.getElementById('numDente');
+            const lista = tipo === 'adulto' ? dentesAdulto : dentesCrianca;
+            selectDente.innerHTML = "";
+            lista.forEach(num => {
+                const option = document.createElement('option');
+                option.value = num;
+                option.textContent = num;
+                selectDente.appendChild(option);
+            });
+        }
+
+        atualizarListaDentes();
+
+        function nextSec(n) {
+            if (n === 4) {
+                const tipo = document.getElementById('tipoProblema').value;
+                document.getElementById('camposCarie').style.display = tipo === "lesao" ? 'none' : 'block';
+                document.getElementById('camposLesao').style.display = tipo === "lesao" ? 'block' : 'none';
+                document.getElementById('msgLesao').style.display = tipo === "lesao" ? 'block' : 'none';
+            }
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById('sec' + n).classList.add('active');
+            document.getElementById('stepTag').innerText = "Passo " + n + " de 4";
+            window.scrollTo(0, 0);
+        }
+
+        function previewImg() {
+            const file = document.getElementById('foto').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = document.getElementById('preview');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    document.getElementById('txtFoto').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
             }
         }
 
-        const btnA = document.getElementById('btnAdd'); const btnF = document.getElementById('btnFim');
-        btnA.disabled = true; btnF.disabled = true;
-        document.getElementById('status').innerText = "⏳ Enviando dados... Aguarde.";
+        function getIniciais(nome) { return nome.trim().split(' ').map(n => n[0]).join('').toUpperCase(); }
 
-        const reader = new FileReader();
-        reader.readAsDataURL(foto);
-        reader.onload = async function() {
-            const prof = document.getElementById('profissional').value;
-            const ts = new Date().getTime();
+        async function enviar(manter) {
+            const foto = document.getElementById('foto').files[0];
+            const tipo = document.getElementById('tipoProblema').value;
 
-            const pacienteRaw = document.getElementById('paciente').value.trim();
-            const pacienteLimpo = pacienteRaw.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "").toLowerCase();
+            if (!foto) { mostrarModal("Erro", "A foto é obrigatória!", "❌", "#dc3545"); return; }
+            
+            // Validações do tipo Cárie
+            if (tipo === 'carie') {
+                if (!document.getElementById('superficie').value || !document.getElementById('icdasLesao').value || !document.getElementById('icdasRest').value) {
+                    mostrarModal("Erro", "Campos obrigatórios faltando (Dente, Superfície ou ICDAS)!", "❌", "#dc3545"); return;
+                }
+            }
 
-            const nomeArquivo = tipo === 'carie' ? `${pacienteLimpo}_C_ICDAS${document.getElementById('icdasLesao').value}_D${dente}_${getIniciais(prof)}_${ts}.jpg` : `${pacienteLimpo}_L_${getIniciais(prof)}_${ts}.jpg`;
+            // 🌟 VALIDAÇÕES DO TIPO LESÃO Bucal
+            let localColetaFinal = "N/A";
+            let tcleFinal = "N/A";
+            let biopsiaFinal = "N/A";
 
-            const payload = {
-                profissional: prof,
-                paciente: document.getElementById('paciente').value.trim() || "NaN",
-                documento: document.getElementById('documento').value.trim() || "NaN",
-                genero: document.getElementById('genero').value || "NaN",
-                idade: document.getElementById('idade').value || "NaN",
-                unidade: document.getElementById('unidade').value || "NaN",
-                denticao: tipo === 'lesao' ? "N/A" : document.getElementById('tipoDenticao').value,
-                tipo: tipo,
-                dente: tipo === 'lesao' ? "N/A" : dente,
-                superficie: tipo === 'lesao' ? "N/A" : document.getElementById('superficie').value,
-                icdasLesao: tipo === 'lesao' ? "N/A" : document.getElementById('icdasLesao').value,
-                icdasRest: tipo === 'lesao' ? "N/A" : document.getElementById('icdasRest').value,
-                comentario: document.getElementById('comentario').value,
-                foto: reader.result.split(',')[1],
-                nomeArquivo: nomeArquivo
-            };
+            if (tipo === 'lesao') {
+                const selectLC = document.getElementById('localColetaSelect');
+                const inputLCOutro = document.getElementById('localColetaOutro');
+                localColetaFinal = (selectLC.value === "outro") ? inputLCOutro.value.trim() : selectLC.value;
 
-            try {
-                await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                
-                contadorFotos++; // Incrementa sempre que o envio tem sucesso
-                document.getElementById('contadorImagens').style.display = 'block';
-                document.getElementById('numContador').innerText = contadorFotos;
+                const tcleRadio = document.querySelector('input[name="tcle"]:checked');
+                const biopsiaRadio = document.querySelector('input[name="biopsia"]:checked');
 
-                if (manter) {
-                    mostrarModal("Sucesso!", "Imagem enviada. Você pode adicionar outra.");
-                    document.getElementById('foto').value = "";
-                    document.getElementById('preview').style.display = 'none';
-                    document.getElementById('txtFoto').style.display = 'flex';
-                    document.getElementById('comentario').value = "";
+                if (!localColetaFinal || !tcleRadio || !biopsiaRadio) {
+                    mostrarModal("Erro", "Campos obrigatórios de Lesão faltando (Local de Coleta, TCLE ou Biópsia)!", "❌", "#dc3545");
+                    return;
+                }
+
+                tcleFinal = tcleRadio.value;
+                biopsiaFinal = biopsiaRadio.value;
+            }
+
+            const btnA = document.getElementById('btnAdd'); const btnF = document.getElementById('btnFim');
+            btnA.disabled = true; btnF.disabled = true;
+            document.getElementById('status').innerText = "⏳ Enviando dados... Aguarde.";
+
+            const reader = new FileReader();
+            reader.readAsDataURL(foto);
+            reader.onload = async function () {
+                const prof = document.getElementById('profissional').value;
+                const ts = new Date().getTime();
+                const dente = tipo === 'carie' ? document.getElementById('numDente').value : "N/A";
+
+                const pacienteRaw = document.getElementById('paciente').value.trim();
+                const pacienteLimpo = pacienteRaw.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "").toLowerCase();
+
+                const nomeArquivo = tipo === 'carie' 
+                    ? `${pacienteLimpo}_C_ICDAS${document.getElementById('icdasLesao').value}_D${dente}_${getIniciais(prof)}_${ts}.jpg` 
+                    : `${pacienteLimpo}_L_${getIniciais(prof)}_${ts}.jpg`;
+
+                // 🌟 PAYLOAD COMPLETO AJUSTADO COM TODOS OS NOVOS CAMPOS
+                const payload = {
+                    profissional: prof,
+                    paciente: pacienteRaw || "NaN",
+                    documento: document.getElementById('documento').value.trim() || "NaN",
+                    genero: document.getElementById('genero').value || "NaN",
+                    idade: document.getElementById('idade').value || "NaN",
+                    unidade: document.getElementById('unidade').value || "NaN",
+                    tipo: tipo,
+                    // Campos de cárie
+                    denticao: tipo === 'lesao' ? "N/A" : document.getElementById('tipoDenticao').value,
+                    dente: dente,
+                    superficie: tipo === 'lesao' ? "N/A" : document.getElementById('superficie').value,
+                    icdasLesao: tipo === 'lesao' ? "N/A" : document.getElementById('icdasLesao').value,
+                    icdasRest: tipo === 'lesao' ? "N/A" : document.getElementById('icdasRest').value,
+                    // Campos de lesão capturados dinamicamente do HTML
+                    localColeta: localColetaFinal,
+                    tcle: tcleFinal,
+                    descricaoLesao: tipo === 'lesao' ? (document.getElementById('descricaoLesao').value || "N/A") : "N/A",
+                    biopsia: biopsiaFinal,
+                    laudoBiopsia: (tipo === 'lesao' && biopsiaFinal === 'realizada') ? (document.getElementById('laudoBiopsia').value || "N/A") : "N/A",
+                    hipoteseDiagnostica: tipo === 'lesao' ? (document.getElementById('hipoteseDiagnostica').value || "N/A") : "N/A",
+                    // Comentário comum e metadados
+                    comentario: document.getElementById('comentario').value || "",
+                    foto: reader.result.split(',')[1],
+                    nomeArquivo: nomeArquivo
+                };
+
+                try {
+                    // 🌟 CONFIGURAÇÃO SEM NO-CORS PARA NÃO PERDER COLUNAS NO POST
+                    const response = await fetch(SCRIPT_URL, { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify(payload) 
+                    });
+
+                    const resTexto = await response.text();
+                    if(resTexto.includes("Erro")) throw new Error(resTexto);
+
+                    contadorFotos++; 
+                    document.getElementById('contadorImagens').style.display = 'block';
+                    document.getElementById('numContador').innerText = contadorFotos;
+
+                    if (manter) {
+                        mostrarModal("Sucesso!", "Imagem enviada. Você pode adicionar outra.");
+                        document.getElementById('foto').value = "";
+                        document.getElementById('preview').style.display = 'none';
+                        document.getElementById('txtFoto').style.display = 'flex';
+                        document.getElementById('comentario').value = "";
+                        // Limpa campos específicos de lesão se existirem
+                        if(tipo === 'lesao') {
+                            document.getElementById('descricaoLesao').value = "";
+                            document.getElementById('laudoBiopsia').value = "";
+                            document.getElementById('hipoteseDiagnostica').value = "";
+                            const tcleChecked = document.querySelector('input[name="tcle"]:checked');
+                            const biopsiaChecked = document.querySelector('input[name="biopsia"]:checked');
+                            if(tcleChecked) tcleChecked.checked = false;
+                            if(biopsiaChecked) biopsiaChecked.checked = false;
+                            document.getElementById('boxLaudoBiopsia').style.display = 'none';
+                        }
+                        btnA.disabled = false; btnF.disabled = false;
+                        document.getElementById('status').innerText = "";
+                    } else {
+                        mostrarModal("Concluído!", "Paciente finalizado com sucesso. Total de " + contadorFotos + " foto(s) enviada(s).", "✅", "var(--success)", true);
+                    }
+                } catch (e) {
+                    console.error("Erro no envio:", e);
+                    mostrarModal("Erro", "Erro ao enviar dados para a planilha. Detalhes: " + e.message, "❌", "#dc3545");
                     btnA.disabled = false; btnF.disabled = false;
                     document.getElementById('status').innerText = "";
-                } else { 
-                    // MOSTRA O TOTAL DE FOTOS NO MODAL FINAL
-                    mostrarModal("Concluído!", "Paciente finalizado com sucesso. Total de " + contadorFotos + " foto(s) enviada(s).", "✅", "var(--success)", true);
                 }
-            } catch (e) { 
-                mostrarModal("Erro", "Erro ao enviar dados. Verifique a conexão.", "❌", "#dc3545");
-                btnA.disabled = false; btnF.disabled = false; 
-                document.getElementById('status').innerText = "";
-            }
-        };
-    }
-</script>
+            };
+        }
+    </script>
 </body>
+
 </html>
